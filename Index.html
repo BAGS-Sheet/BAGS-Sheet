@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+        function submitCredentials() {
+            document.getElementById("status").innerText = "Authenticating with Bluesky...";
+            document.getElementById("loading").style.display = "block";
+
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+            var hashtags = document.getElementById("hashtags").value.split(",").map(tag => tag.trim());
+
+            google.script.run
+                .withSuccessHandler(function(spreadsheetUrl) {
+                    document.getElementById("status").innerText = "Fetching data...";
+                    
+                    setTimeout(() => {
+                        window.open(spreadsheetUrl, "_blank");
+                        document.getElementById("status").innerText = "Spreadsheet opened successfully!";
+                        document.getElementById("loading").style.display = "none";
+                    }, 3000);
+                })
+                .withFailureHandler(function(error) {
+                    document.getElementById("status").innerText = "Error: " + error.message;
+                    document.getElementById("loading").style.display = "none";
+                })
+                .saveUserCredentials(username, password, hashtags);
+        }
+    </script>
+</head>
+<body>
+    <h2>Bluesky Hashtag Monitor</h2>
+    <label for="username">Bluesky Username:</label>
+    <input type="text" id="username" required><br><br>
+
+    <label for="password">Bluesky App Password:</label>
+    <input type="password" id="password" required><br><br>
+
+    <label for="hashtags">Enter Hashtags (comma-separated):</label>
+    <input type="text" id="hashtags" required placeholder="Example: DigitalHumanities, OpenData"><br><br>
+
+    <button onclick="submitCredentials()">Start Monitoring</button>
+
+    <p id="status"></p>
+    <div id="loading" style="display: none;">
+        <img src="https://i.gifer.com/ZZ5H.gif" alt="Loading..." width="50">
+    </div>
+</body>
+</html>
